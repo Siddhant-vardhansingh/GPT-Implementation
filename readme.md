@@ -10,6 +10,7 @@ This project covers everything from **data loading → tokenization → model ar
 - GPT.py: Implements a decoder-only Transformer with 4 layers and 4 attention heads. Uses `torch.nn.MultiheadAttention` for masked self-attention.
 - GPT-v2.py: Implements the same architecture but does not use `torch.nn.MultiheadAttention`. Instead, it implements masked self-attention from scratch using `torch.nn.Linear` layers and manual masking.
 - encoder-decoder.py: Implements a full Transformer architecture with both encoder and decoder blocks. The encoder processes the input sequence, while the decoder generates the output sequence using masked self-attention and cross-attention to the encoder outputs.
+- bert.py: Implements a BERT-style encoder-only Transformer architecture. It adds |CLS| token at the beginning of the input sequence predict whether the ImDB movie review is positive or negative. It uses masked self-attention without causal masking, allowing the model to attend to all tokens in the input sequence.
 
 ---
 
@@ -52,6 +53,24 @@ This project covers everything from **data loading → tokenization → model ar
     - Feedforward Neural Network (MLP)
     - Residual Connections
 
+### bert.py implements a **BERT-style encoder-only Transformer** architecture:
+
+#### 🔹 Model Components
+
+- **Embedding Layer**
+  - Token Embedding
+  - Positional Embedding
+  - |CLS| Token Embedding
+
+- **Encoder Blocks (Stacked 4 times)**
+  - LayerNorm
+  - Masked Multi-Head Self Attention (No Causal Masking)
+  - Feedforward Neural Network (MLP)
+  - Residual Connections
+
+- **Final LayerNorm + Classification Head**
+  - Projects to number of classes (e.g., positive/negative for sentiment analysis)
+
 ---
 
 ## 📊 Dataset
@@ -71,3 +90,11 @@ We use a **IIT Bombay English-Hindi parallel corpus** for machine translation.
 - Source: IIT Bombay
 - Format: Parallel sentences (English-Hindi)
 - Tokenization: Separate tokenizers for English and Hindi using `SentencePiece` by Google
+
+### bert.py (Sentiment Analysis Task)
+
+We use the **IMDB movie reviews dataset** for sentiment analysis.
+
+- Source: IMDB
+- Format: Raw text
+- Tokenization: BERT tokenizer via `transformers` library
