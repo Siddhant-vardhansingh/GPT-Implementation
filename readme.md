@@ -13,21 +13,6 @@ This project covers everything from **data loading → tokenization → model ar
 
 ---
 
-<!--
-## 🚀 Overview
-
-This project implements a **decoder-only Transformer (GPT)** using PyTorch APIs:
-
-- Masked Multi-Head Self Attention (Causal Masking)
-- Positional + Token Embeddings
-- Residual Connections + LayerNorm
-- Feedforward (MLP) layers
-- Cross Entropy Loss for language modeling
-- Training on **WikiText-2 dataset**
-- Text generation using sampling
-
---- -->
-
 ## 🏗️ Architecture
 
 ### GPT.py and GPT-v2.py implement a **decoder-only Transformer** with the following components:
