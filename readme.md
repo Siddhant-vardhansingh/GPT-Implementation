@@ -13,6 +13,7 @@ This project covers everything from **data loading → tokenization → model ar
 
 ---
 
+<!--
 ## 🚀 Overview
 
 This project implements a **decoder-only Transformer (GPT)** using PyTorch APIs:
@@ -25,11 +26,13 @@ This project implements a **decoder-only Transformer (GPT)** using PyTorch APIs:
 - Training on **WikiText-2 dataset**
 - Text generation using sampling
 
----
+--- -->
 
 ## 🏗️ Architecture
 
-### 🔹 Model Components
+### GPT.py and GPT-v2.py implement a **decoder-only Transformer** with the following components:
+
+#### 🔹 Model Components
 
 - **Embedding Layer**
   - Token Embedding
@@ -44,15 +47,45 @@ This project implements a **decoder-only Transformer (GPT)** using PyTorch APIs:
 - **Final LayerNorm + Linear Head**
   - Projects to vocabulary size
 
+### encoder-decoder.py implements a **full Transformer architecture** with both encoder and decoder blocks:
+
+#### 🔹 Model Components
+
+- **Encoder**
+  - Embedding Layer (Token + Positional)
+  - Stacked Encoder Blocks (4 layers)
+    - LayerNorm
+    - Multi-Head Self Attention (no masking)
+    - Feedforward Neural Network (MLP)
+    - Residual Connections
+- **Decoder**
+  - Embedding Layer (Token + Positional)
+  - Stacked Decoder Blocks (4 layers)
+    - LayerNorm
+    - Masked Multi-Head Self Attention (Causal Masking)
+    - Cross-Attention to Encoder Outputs
+    - Feedforward Neural Network (MLP)
+    - Residual Connections
+
 ---
 
 ## 📊 Dataset
+
+### GPT.py and GPT-v2.py (Sequence Generation Task)
 
 We use **WikiText-2**, a cleaned Wikipedia dataset.
 
 - Source: PyTorch examples repo
 - Format: Raw text
 - Tokenization: GPT-2 tokenizer via `tiktoken`
+
+### encoder-decoder.py (Translation Task)
+
+We use a **IIT Bombay English-Hindi parallel corpus** for machine translation.
+
+- Source: IIT Bombay
+- Format: Parallel sentences (English-Hindi)
+- Tokenization: Separate tokenizers for English and Hindi using `SentencePiece` by Google
 
 ---
 
@@ -207,4 +240,4 @@ This project helps you understand:
 - OpenAI GPT tokenizer (`tiktoken`)
 - WikiText-2 dataset
 
-![alt text](image.png)
+![alt text](image.png) -->

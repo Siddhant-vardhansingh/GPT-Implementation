@@ -112,19 +112,66 @@ class Translation(nn.Module):
             loss = F.cross_entropy(logits, targets, ignore_index=PAD)
 
         return logits, loss
+    
+    @torch.no_grad()
+    def generate(self, src, max_new_tokens=32):
+        self.eval()
 
+        # ---- Encoder ----
+        B, T_src = src.shape
+        src_tok_emb = self.transformer.token_embedding_encoder(src)
+        src_pos = torch.arange(0, T_src)
+        src_pos_emb = self.transformer.pos_embedding_encoder(src_pos)
 
-dataset = load_dataset("cfilt/iitb-english-hindi")
+        enc_x = src_tok_emb + src_pos_emb
+        for block in self.transformer.encoder:
+            enc_x = block(enc_x)
+
+        encoder_output = enc_x
+
+        # ---- Decoder init ----
+        tgt = torch.full((B, 1), BOS, dtype=torch.long)
+
+        for _ in range(max_new_tokens):
+            T_tgt = tgt.shape[1]
+
+            tgt_tok_emb = self.transformer.token_embedding_decoder(tgt)
+            tgt_pos = torch.arange(0, T_tgt)
+            tgt_pos_emb = self.transformer.pos_embedding_decoder(tgt_pos)
+
+            dec_x = tgt_tok_emb + tgt_pos_emb
+
+            for block in self.transformer.decoder:
+                dec_x = block(dec_x, encoder_output)
+
+            dec_x = self.transformer.layer_norm(dec_x)
+            logits = self.lm_head(dec_x)
+
+            # Take last token prediction
+            next_token_logits = logits[:, -1, :]
+            next_token = torch.argmax(next_token_logits, dim=-1, keepdim=True)
+
+            tgt = torch.cat([tgt, next_token], dim=1)
+
+            # Stop if EOS generated
+            if (next_token == EOS).all():
+                break
+
+        return tgt
+
+dataset = load_dataset("cfilt/iitb-english-hindi", split="train[:20%]")
+
+# ---- SentencePiece ----
 if not os.path.exists("spm.model"):
     with open("corpus.txt", "w", encoding="utf-8") as f:
-        for ex in dataset["train"]:
+        for ex in dataset:
             f.write(ex["translation"]["en"] + "\n")
             f.write(ex["translation"]["hi"] + "\n")
 
     spm.SentencePieceTrainer.train(
         input="corpus.txt",
         model_prefix="spm",
-        vocab_size=16000
+        vocab_size=8000  # smaller = faster
     )
 
 sp = spm.SentencePieceProcessor()
@@ -132,10 +179,10 @@ sp.load("spm.model")
 
 BOS = sp.bos_id()
 EOS = sp.eos_id()
-PAD = 0   # safe choice
+PAD = 0
 MAX_LEN = 32
 
-# Preprocessing
+
 def encode(example):
     en = example["translation"]["en"]
     hi = example["translation"]["hi"]
@@ -156,17 +203,25 @@ def encode(example):
         "targets": torch.tensor(targets)
     }
 
-tokenized_dataset = dataset["train"].map(encode)
+
+tokenized_dataset = dataset.map(encode)
 tokenized_dataset.set_format(type="torch", columns=["src", "tgt", "targets"])
 
-loader = DataLoader(tokenized_dataset, batch_size=8, shuffle=True)
+loader = DataLoader(
+    tokenized_dataset,
+    batch_size=32,
+    shuffle=True,
+    num_workers=0,
+    pin_memory=False
+)
 
-# Training
+# ---------------- TRAIN ----------------
+
 
 model = Translation(TranslationConfig())
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 
-for epoch in range(3):
+for epoch in range(10):
     for batch in loader:
         src = batch["src"]
         tgt = batch["tgt"]
@@ -179,3 +234,34 @@ for epoch in range(3):
         optimizer.step()
 
     print(f"Epoch {epoch} Loss: {loss.item()}")
+
+
+
+def translate(sentence):
+    model.eval()
+
+    # Encode input
+    src = sp.encode(sentence)[:MAX_LEN-1] + [EOS]
+    src += [PAD] * (MAX_LEN - len(src))
+
+    src = torch.tensor(src).unsqueeze(0)
+
+    # Generate
+    output_tokens = model.generate(src)
+
+    # Convert to text
+    output_tokens = output_tokens[0].tolist()
+
+    # Remove BOS
+    if output_tokens[0] == BOS:
+        output_tokens = output_tokens[1:]
+
+    # Stop at EOS
+    if EOS in output_tokens:
+        output_tokens = output_tokens[:output_tokens.index(EOS)]
+
+    return sp.decode(output_tokens)
+
+print(translate("How are you?"))
+print(translate("I love machine learning"))
+print(translate("India is a great country"))
