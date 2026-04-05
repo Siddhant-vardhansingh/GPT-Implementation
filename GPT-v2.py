@@ -5,7 +5,6 @@ from torch.nn import functional as F
 import torch.nn as nn
 import tiktoken
 import requests
-import matplotlib.pyplot as plt
 import math
 
 @dataclass
@@ -95,7 +94,7 @@ class GPT(nn.Module):
 
         x = tok_emb + pos_emb
         for Block in self.transformer.decoder:
-            x = Block(x) ### Passing through all 12 Decoder Blocks
+            x = Block(x) ### Passing through all 4 Decoder Blocks
         
         x = self.transformer.layer_norm(x)
         logits = self.lm_head(x) ### B, T, n_embd ----> B, T, Vocab_Size

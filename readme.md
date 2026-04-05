@@ -5,6 +5,14 @@ This project covers everything from **data loading → tokenization → model ar
 
 ---
 
+## Features:
+
+- GPT.py: Implements a decoder-only Transformer with 4 layers and 4 attention heads. Uses `torch.nn.MultiheadAttention` for masked self-attention.
+- GPT-v2.py: Implements the same architecture but does not use `torch.nn.MultiheadAttention`. Instead, it implements masked self-attention from scratch using `torch.nn.Linear` layers and manual masking.
+- encoder-decoder.py: Implements a full Transformer architecture with both encoder and decoder blocks. The encoder processes the input sequence, while the decoder generates the output sequence using masked self-attention and cross-attention to the encoder outputs.
+
+---
+
 ## 🚀 Overview
 
 This project implements a **decoder-only Transformer (GPT)** using PyTorch APIs:
