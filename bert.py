@@ -136,4 +136,4 @@ def predict_sentiment(text, model, config, enc):
 # --- Example Usage ---
 review = "It is the greatest masterpiece, Good Direction and Acting"
 label, conf = predict_sentiment(review, model, BERTConfig(), enc)
-print(f"Sentiment: {label} ({conf*100:.2f}%)")
+print(f"Sentiment of the {review}: {label} ({conf*100:.2f}%)")

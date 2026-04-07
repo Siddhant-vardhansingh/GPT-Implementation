@@ -16,7 +16,7 @@ This project covers everything from **data loading → tokenization → model ar
 
 ## 🏗️ Architecture
 
-### GPT.py and GPT-v2.py implement a **decoder-only Transformer** with the following components:
+### GPT.py and GPT-v2.py implement a **decoder-only Transformer** with the following components (14M parameters):
 
 #### 🔹 Model Components
 
@@ -33,7 +33,7 @@ This project covers everything from **data loading → tokenization → model ar
 - **Final LayerNorm + Linear Head**
   - Projects to vocabulary size
 
-### encoder-decoder.py implements a **full Transformer architecture** with both encoder and decoder blocks:
+### encoder-decoder.py implements a **full Transformer architecture** with both encoder and decoder blocks (80M parameters):
 
 #### 🔹 Model Components
 
@@ -97,7 +97,7 @@ We use the **IMDB movie reviews dataset** for sentiment analysis.
 
 - Source: IMDB
 - Format: Raw text
-- Tokenization: BERT tokenizer via `transformers` library
+- Tokenization: GPT-2 tokenizer via `tiktoken` (with added |CLS| token)
 
 ---
 
@@ -110,3 +110,7 @@ We use the **IMDB movie reviews dataset** for sentiment analysis.
 ### encoder-decoder.py
 
 ![alt text](image.png)
+
+### bert.py
+
+![alt text](image-2.png)
