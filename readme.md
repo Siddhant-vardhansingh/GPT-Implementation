@@ -98,3 +98,15 @@ We use the **IMDB movie reviews dataset** for sentiment analysis.
 - Source: IMDB
 - Format: Raw text
 - Tokenization: BERT tokenizer via `transformers` library
+
+---
+
+## Results
+
+### GPT.py and GPT-v2.py
+
+![alt text](image-1.png)
+
+### encoder-decoder.py
+
+![alt text](image.png)

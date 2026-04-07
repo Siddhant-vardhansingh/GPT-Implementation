@@ -159,7 +159,7 @@ class Translation(nn.Module):
 
         return tgt
 
-dataset = load_dataset("cfilt/iitb-english-hindi", split="train[:20%]")
+dataset = load_dataset("cfilt/iitb-english-hindi", split="train")
 
 # ---- SentencePiece ----
 if not os.path.exists("spm.model"):
